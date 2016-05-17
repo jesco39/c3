@@ -16,7 +16,7 @@ requires = [
 setup(
     name='C3',
     package=['C3'],
-    version='0.2',
+    version='0.3',
     description='C3 - Provisions AWS services from easy to read ini configs',
     long_description=README + '\n\n' + CHANGELOG,
     classifiers=[

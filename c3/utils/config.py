@@ -375,7 +375,9 @@ class ClusterConfig(object):
         return self.global_ssg
 
     def get_aws_region(self):
-        ''' We work in only one region, so we can just take the first '''
+        ''' Get AWS region '''
+        if self.ini.has_option('cluster', 'region'):
+            return self.get_ini('cluster', 'region', str)
         if self.get_azs()[0] == 'auto':
             return 'us-east-1'
         else:

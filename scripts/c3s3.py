@@ -63,11 +63,11 @@ def generate_file(data, output_dir, account, bucket):
     conf.close()
 
 
-def send_to_aws(data, account, bucket, tagset, verbose):
+def send_to_aws(data, account, bucket, tagset, region, verbose):
     ''' Creates a connection to AWS and sends data '''
     conn_manager = ZambiConn()
     conn = conn_manager.get_connection(account, service='s3')
-    s3_bucket = C3S3Bucket(conn, bucket)
+    s3_bucket = C3S3Bucket(conn, bucket, region)
     print 'INFO: Updating %s:%s' % (account, bucket)
     print 'INFO: Setting tags'
     if verbose:
@@ -97,14 +97,14 @@ def generate_entries(user, config):
     return gen_entry.gen_s3_entry(ini, user, acct_id)
 
 
-def get_tags(config, verbose):
-    ''' Get bucket cost tags from config '''
+def read_cluster_config(config, verbose):
+    ''' Read cluster config options '''
     cluster_config = c3.utils.config.ClusterConfig(
         ini_file=config,
         prv_type='s3',
         verbose=verbose,
-        no_defaults=True)
-    return cluster_config.get_tagset()
+        no_defaults=False)
+    return cluster_config
 
 
 def parser_setup():
@@ -158,7 +158,9 @@ def main():
         user = conf.split('.ini')[0]
         if user:
             if user == 'meta':
-                tagset = get_tags(config, options.verbose)
+                cluster_config = read_cluster_config(config, options.verbose)
+                tagset = cluster_config.get_tagset()
+                region = cluster_config.get_aws_region()
             else:
                 entries += generate_entries(user, config)
     if len(entries) == 0:
@@ -169,7 +171,7 @@ def main():
         print 'ERROR: Missing tags in meta.ini'
         sys.exit(1)
     if options.output_dir is None:
-        send_to_aws(policy, account, bucket, tagset, options.verbose)
+        send_to_aws(policy, account, bucket, tagset, region, options.verbose)
     else:
         generate_file(policy, options.output_dir, account, bucket)
 

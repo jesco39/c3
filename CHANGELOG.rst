@@ -1,8 +1,12 @@
 Changelog
 =========
-Current Release (0.2)
+Current Release (0.3)
 ------------------
 * C3: CloudCloudCloud Manages automation of AWS accounts and services.
+
+0.3
+~~~~~~~
+* feature: Add support for creating buckets in different regions
 
 0.2
 ~~~~~~~
